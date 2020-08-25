@@ -1,7 +1,7 @@
 # About Bootstrap Simple Admin Template
 *Bootstrap Simple Admin Template is a simple admin template packed with more UI components than any other admin themes, its exceptional user interface is perfectly crafted and advanced layout features are optimized to suite every modern web application project and highly responsive to serve from a Mobile first to Desktop screen.* 
 
-![Bootstrap Simple Admin Template - Dashboard](https://i.postimg.cc/4yNy2Kv2/dashboard.png)
+![Bootstrap Simple Admin Template - Dashboard](https://i.postimg.cc/vHTC0yjZ/dashboard.png)
 
 ### What's New?
 - New default theme
