@@ -1,10 +1,10 @@
 /*------------------------------------------------------------------
 * Bootstrap Simple Admin Template
-* Email: heyalexluna@gmail.com
-* Version: 1.1
+* Contact: heyalexluna@gmail.com
+* Version: 1.2
 * Author: Alexis Luna
-* Copyright 2019 Alexis Luna
-* Website: https://github.com/mralexisluna/bootstrap-simple-admin-template
+* Copyright 2020 Alexis Luna
+* Website: https://github.com/alexis-luna/bootstrap-simple-admin-template
 -------------------------------------------------------------------*/
 
 @import "../components/navbar/navbar-dropdowns.css";
@@ -60,7 +60,22 @@ Notes:  decreasing heading by 0.4em with every subsequent heading level
     src: url("../font/Lato-Regular.eot?#iefix") format("embedded-opentype"), url("../font/Lato-Regular.woff") format("woff"), url("../font/Lato-Regular.ttf") format("truetype");
 }
 
-body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, a, td {
+body,
+h1,
+.h1,
+h2,
+.h2,
+h3,
+.h3,
+h4,
+.h4,
+h5,
+.h5,
+h6,
+.h6,
+p,
+a,
+td {
     -moz-osx-font-smoothing: grayscale;
     -webkit-font-smoothing: antialiased;
 }
@@ -68,7 +83,7 @@ body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6, p, a, td {
 body {
     width: 100%;
     height: 100%;
-    background: #f1f1f1;
+    background: #f6f7fb;
     font-family: "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif;
     font-size: 1rem;
     color: #444;
@@ -94,6 +109,8 @@ body {
 #body>.navbar {
     padding: 0 1.5rem;
     min-height: 54px;
+    box-shadow: none;
+    border-bottom: 1px solid #e6ecf5;
 }
 
 /*------------------------------------------------------------------

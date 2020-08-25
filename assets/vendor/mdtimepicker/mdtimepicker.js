@@ -36,7 +36,7 @@
 		};
 
 		this.setHour = function (value) { this.hour = value; };
-		this.getHour = function (is12Hour) { return is12Hour ? this.hour === 0 || this.hour === 12 ? 12 : (this.hour % 12) : this.hour; };
+		this.getHour = function (is12Hour) { return is12Hour ? [0, 12].indexOf(this.hour) >= 0 ? 12 : (this.hour % 12) : this.hour; };
 		this.invert = function () {
 			if (this.getT() === 'AM') this.setHour(this.getHour() + 12);
 			else this.setHour(this.getHour() - 12);
@@ -47,7 +47,7 @@
 	};
 
 	var MDTimePicker = function (input, config) {
-		var that = this;
+		var _ = this;
 
 		this.visible = false;
 		this.activeView = 'hours';
@@ -79,51 +79,60 @@
 				},
 				buttonsHolder : {
 					wrapper: $('<div class="mdtp__buttons">'),
+					btnClear : $('<span class="mdtp__button clear-btn">Clear</span>'),
 					btnOk : $('<span class="mdtp__button ok">Ok</span>'),
 					btnCancel: $('<span class="mdtp__button cancel">Cancel</span>')
 				}
 			}
 		};
 
-		var picker = that.timepicker;
+		var picker = _.timepicker;
 
-		that.setup(picker).appendTo('body');
+		_.setup(picker).appendTo('body');
 
-		picker.clockHolder.am.click(function () { if (that.selected.getT() !== 'AM') that.setT('am'); });
-		picker.clockHolder.pm.click(function () { if (that.selected.getT() !== 'PM') that.setT('pm'); });
-		picker.timeHolder.hour.click(function () { if (that.activeView !== 'hours') that.switchView('hours'); });
-		picker.timeHolder.minute.click(function () { if (that.activeView !== 'minutes') that.switchView('minutes'); });
+		picker.clockHolder.am.click(function () { if (_.selected.getT() !== 'AM') _.setT('am'); });
+		picker.clockHolder.pm.click(function () { if (_.selected.getT() !== 'PM') _.setT('pm'); });
+		picker.timeHolder.hour.click(function () { if (_.activeView !== 'hours') _.switchView('hours'); });
+		picker.timeHolder.minute.click(function () { if (_.activeView !== 'minutes') _.switchView('minutes'); });
 		picker.clockHolder.buttonsHolder.btnOk.click(function () {
-			that.setValue(that.selected);
+			_.setValue(_.selected);
 
-			var formatted = that.getFormattedTime();
+			var formatted = _.getFormattedTime();
 
-			that.input.trigger($.Event('timechanged', { time: formatted.time, value: formatted.value }))
-				.trigger('onchange')	// for ASP.Net postback
-				.trigger('change');
-				
-			that.hide();
+			_.triggerChange({ time: formatted.time, value: formatted.value });
+			_.hide();
 		});
-		picker.clockHolder.buttonsHolder.btnCancel.click(function () { that.hide(); });
+		picker.clockHolder.buttonsHolder.btnCancel.click(function () { _.hide(); });
 
-		that.input.on('keydown', function (e) { 
-			if (e.keyCode === 13) that.show();
-			return !(EX_KEYS.indexOf(e.which) < 0 && that.config.readOnly); })
-			.on('click', function () { that.show(); })
-			.prop('readonly', that.config.readOnly);
+		if (_.config.clearBtn) {
+			picker.clockHolder.buttonsHolder.btnClear.click(function () {
+				_.input.val('')
+					.attr('data-time', null)
+					.attr('value', '');
 
-		if (that.input.val() !== '') {
-			var time = that.parseTime(that.input.val(), that.config.format);
-
-			that.setValue(time);
-		} else {
-			var time = that.getSystemTime();
-
-			that.time = new Time(time.hour, time.minute);
+				_.triggerChange({ time: null, value: '' });					
+				_.hide();
+			});
 		}
 
-		that.resetSelected();
-		that.switchView(that.activeView);
+		_.input.on('keydown', function (e) { 
+			if (e.keyCode === 13) _.show();
+			return !(EX_KEYS.indexOf(e.which) < 0 && _.config.readOnly); })
+			.on('click', function () { _.show(); })
+			.prop('readonly', _.config.readOnly);
+
+		if (_.input.val() !== '') {
+			var time = _.parseTime(_.input.val(), _.config.format);
+
+			_.setValue(time);
+		} else {
+			var time = _.getSystemTime();
+
+			_.time = new Time(time.hour, time.minute);
+		}
+
+		_.resetSelected();
+		_.switchView(_.activeView);
 	};
 
 	MDTimePicker.prototype = {
@@ -132,7 +141,7 @@
 		setup : function (picker) {
 			if (typeof picker === 'undefined') throw new Error('Expecting a value.');
 
-			var that = this, overlay = picker.overlay, wrapper = picker.wrapper,
+			var _ = this, overlay = picker.overlay, wrapper = picker.wrapper,
 				time = picker.timeHolder, clock = picker.clockHolder;
 
 			// Setup time holder
@@ -149,11 +158,11 @@
 				
 				hour.find('span').click(function () {
 					var _data = parseInt($(this).parent().data('hour')),
-						_selectedT = that.selected.getT(),
+						_selectedT = _.selected.getT(),
 						_value = (_data + ((_selectedT === 'PM' && _data < 12) || (_selectedT === 'AM' && _data === 12) ? 12 : 0)) % 24;
 
-					that.setHour(_value);
-					that.switchView('minutes');
+					_.setHour(_value);
+					_.switchView('minutes');
 				});
 
 				clock.clock.hours.append(hour);
@@ -168,7 +177,7 @@
 				else minute.html('<span></span>');
 
 				minute.find('span').click(function () {
-					that.setMinute($(this).parent().data('minute'));
+					_.setMinute($(this).parent().data('minute'));
 				});
 
 				clock.clock.minutes.append(minute);
@@ -183,25 +192,18 @@
 				.appendTo(clock.wrapper);
 
 			// Setup buttons
+			if (_.config.clearBtn) {
+				clock.buttonsHolder.wrapper.append(clock.buttonsHolder.btnClear);
+			}
+
 			clock.buttonsHolder.wrapper.append(clock.buttonsHolder.btnCancel)
 				.append(clock.buttonsHolder.btnOk)
 				.appendTo(clock.wrapper);
 
 			clock.wrapper.appendTo(wrapper);
 
-			switch(that.config.theme) {
-				case 'red':
-				case 'blue':
-				case 'green':
-				case 'purple':
-				case 'indigo':
-				case 'teal':
-					wrapper.attr('data-theme', that.config.theme);
-				break;
-				default:
-					wrapper.attr('data-theme', $.fn.mdtimepicker.defaults.theme);
-				break;
-			}
+			// Setup theme
+			wrapper.attr('data-theme', _.config.theme || $.fn.mdtimepicker.defaults.theme);
 
 			wrapper.appendTo(overlay);
 
@@ -412,20 +414,31 @@
 				.unbind('keydown').unbind('click')
 				.removeProp('readonly');
 			that.timepicker.overlay.remove();
+		},
+
+		triggerChange: function (evtObj) {
+			this.input.trigger($.Event('timechanged', evtObj))
+				.trigger('onchange')	// for ASP.Net postback
+				.trigger('change');
 		}
 	};
 
-	$.fn.mdtimepicker = function (config) {
+	$.fn.mdtimepicker = function () {
+		var mdtp_args = arguments, 
+			arg0 = mdtp_args[0];
+
 		return $(this).each(function (idx, el) {
 			var that = this,
 				$that = $(this),
 				picker = $(this).data(MDTP_DATA);
-				options = $.extend({}, $.fn.mdtimepicker.defaults, $that.data(), typeof config === 'object' && config);
+				options = $.extend({}, $.fn.mdtimepicker.defaults, $that.data(), typeof arg0 === 'object' && arg0);
 
 			if (!picker) {
 				$that.data(MDTP_DATA, (picker = new MDTimePicker(that, options)));
 			}
-			if(typeof config === 'string') picker[config]();
+
+			if(typeof arg0 === 'string')
+				picker[arg0].apply(picker, Array.prototype.slice.call(mdtp_args).slice(1));
 
 			$(document).on('keydown', function (e) {
 				if(e.keyCode !== 27) return;
@@ -440,6 +453,7 @@
 		format: 'h:mm tt',			// format of the input value
 		theme: 'blue',				// theme of the timepicker
 		readOnly: true,				// determines if input is readonly
-		hourPadding: false			// determines if display value has zero padding for hour value less than 10 (i.e. 05:30 PM); 24-hour format has padding by default
+		hourPadding: false,			// determines if display value has zero padding for hour value less than 10 (i.e. 05:30 PM); 24-hour format has padding by default
+		clearBtn: false             // determines if clear button is visible
 	};
 }(jQuery);
