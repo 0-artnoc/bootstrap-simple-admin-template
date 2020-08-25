@@ -1,6 +1,5 @@
 /*------------------------------------------------------------------
 * Bootstrap Simple Admin Template
-* Contact: heyalexluna@gmail.com
 * Version: 1.2
 * Author: Alexis Luna
 * Copyright 2020 Alexis Luna

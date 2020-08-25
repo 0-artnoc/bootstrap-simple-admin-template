@@ -4,6 +4,8 @@
 ![Bootstrap Simple Admin Template - Dashboard](https://i.postimg.cc/pT94fWs9/dashboard.png)
 
 ### What's New?
+- New default theme
+- New login, signup, and forgot password page look
 - Added Full Calendar plugin
 - Added WYSIWYG Text Editor plugin
 - New user & roles management page
